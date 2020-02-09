@@ -1,4 +1,5 @@
 let inquirer = require("inquirer");
+let CRUD = require("./db_CRUD");
 
 let main = ()=>{
     console.log("--------- Content Management System----------\n          ----- Version 1.0.0 -----     ")
@@ -61,7 +62,11 @@ let ADD = ()=>{
     });
 };
 let MODIFY = ()=>{
-    //get employee list []
+    // let _employees = getEmployees().then((res)=>{console.log(res)}).catch((err)=>{console.log(err)});
+    getEmployees();
+    CRUD.endConnection();
+        
+    // .catch((err)=>{console.log(err)})
     // prompt which employee you want to update
     //CRUD update call
     
@@ -94,7 +99,12 @@ let VIEW = ()=>{
     });
 };
 let EXIT = ()=>{
+    CRUD.endConnection();
     console.log(" ------------- Exiting CMS ------------- ")
 };
-//
+//ASYNC FUNCTIONS
+let getEmployees = async ()=>{
+    let employees = await CRUD.getEmployees();
+    console.log(employees);
+}
 main();
