@@ -15,11 +15,41 @@ connection.connect(function (err) {
     if (err) throw err;
     // console.log("connected as id " + connection.threadId);
 });
-let endConnection = ()=>{
+let endConnection = () => {
     connection.end();
 }
 
 //CRUD OPERATIONS
+
+//Views
+let view = (table) => {
+    //Format input to match table names
+    table = table.toLowerCase(); 
+    table = table.substring(0, table.length - 1);
+    
+    let query = connection.query(
+        "SELECT * FROM ?", [table],
+        (err, res)=>{
+            switch(table){
+                case table = "department":
+                    console.log("Depart data");
+                    break;
+                case table = "role":
+                    console.log("role data");
+                    break;
+                case table = "employee":
+                    console.log("employee data")
+                    break;
+                default:
+                    console.log("An Error occurred, hit ctrl^C to escape");
+            }
+        }
+
+    );
+}
+
+
+
 let getEmployees = () => {
     let employees = [];
     let query = connection.query(
@@ -35,6 +65,7 @@ let getEmployees = () => {
 }
 //EXPORT OPERATIONS
 module.exports = {
-    endConnection : endConnection,
-    getEmployees : getEmployees,
+    endConnection: endConnection,
+    getEmployees: getEmployees,
+    view: view,
 }
