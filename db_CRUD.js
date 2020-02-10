@@ -28,9 +28,9 @@ let view = (table) => {
     table = table.substring(0, table.length - 1);
 
     let query = connection.query(
-        "SELECT * FROM "+table,
+        "SELECT * FROM " + table,
         (err, res) => {
-            if(err) throw err;
+            if (err) throw err;
             switch (table) {
                 case table = "department":
                     console.log("----- Departments -----")
@@ -57,9 +57,16 @@ let view = (table) => {
 
     );
 }
+//Add
+let addDepartment = () => {
 
+}
+let addRole = () => {
 
+}
+let addEmployee = () => {
 
+}
 
 let getEmployees = () => {
     let employees = [];
@@ -74,9 +81,38 @@ let getEmployees = () => {
     )
     return employees;
 }
+let getRoles = () => {
+    let roles = [];
+    let query = connection.query(
+        "SELECT title, role_id FROM role",
+        (err, res) =>{
+            if(err)throw err;
+            for(let i=0; i<res.length; i++){
+               roles.push(`${res[i].title} -ID: ${res[i].role_id}`); 
+            }
+        }
+    )
+    return roles;
+}
+let getDepartments = () => {
+    let departments = [];
+    let query = connection.query(
+        "SELECT name, dep_id FROM department",
+        (err, res) =>{
+            if(err)throw err;
+            for(let i=0; i<res.length; i++){
+               departments.push(`${res[i].name} -ID: ${res[i].dep_id}`); 
+            }
+        }
+    )
+    return departments;
+}
 //EXPORT OPERATIONS
 module.exports = {
     endConnection: endConnection,
     getEmployees: getEmployees,
+    getRoles: getRoles,
+    getDepartments: getDepartments,
     view: view,
+
 }
