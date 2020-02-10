@@ -1,6 +1,10 @@
 let inquirer = require("inquirer");
 let CRUD = require("./db_CRUD");
 
+let employees = [];
+let roles = [];
+let departments = [];
+
 let main = () => {
     console.log("--------- Content Management System----------\n          ----- Version 1.0.0 -----     ")
     start();
@@ -45,13 +49,13 @@ let ADD = () => {
     ]).then((resp) => {
         switch (resp.choice) {
             case resp.choice = "Department":
-                console.log("1")
+                addDepartment();
                 break;
             case resp.choice = "Role":
-                console.log("2")
+                addRole();
                 break;
             case resp.choice = "Employee":
-                console.log("3")
+                addEmployee();
                 break;
             case resp.choice = "Return":
                 start();
@@ -80,9 +84,9 @@ let VIEW = () => {
             name: "choice"
         }
     ]).then((resp) => {
-        if(resp.choice === "Return"){
+        if (resp.choice === "Return") {
             start();
-        }else{
+        } else {
             //NEEDS TO BE ASYNC AWAIT BEFORE RETURNING TO INITIAL OPTION LIST
             CRUD.view(resp.choice);
             // start();
@@ -96,19 +100,81 @@ let EXIT = () => {
 
 // CRUD INQUIRIES
 
-let addEmployee = () => { };
-let addRole = () => { };
-let addDepartment = () => { };
-
-let viewByDepartment = () => {
-
+let addEmployee = () => {
+    inquirer.prompt([
+        {
+            message: "Provide Employee's First Name",
+            type: "input",
+            name: "first_name"
+        },
+        {
+            message: "Provide Employee's Last Name",
+            type: "input",
+            name: "Last_name"
+        },
+        {
+            message: "Select Employee's Role",
+            type: "list",
+            choices: ["DUMMY LIST"],//GET LIST
+            name: "role"
+        }, {
+            message: "OPTIONAL: Provide Employee's Manager id",
+            type: "input",
+            name: "managerID"
+        },
+    ]).then((res) => {
+        console.log(res);
+    })
 };
-let viewByRole = () => { };
-let viewEmployees = () => { };
+let addRole = () => {
+    inquirer.prompt([
+        {
+            message: "Please indicate the title of the position you wish to add:",
+            type: "input",
+            name: "title"
+        },
+        {
+            message: "Please indicate the salary of the position you wish to add:",
+            type: "input",
+            name: "salary"
+        },
+        {
+            message: "Which department does this position belong to?:",
+            type: "list",
+            choices: ["DUMMY LIST"], //GET CHOICES
+            name: "department_id"
+        },
+    ]).then((res) => {
+        console.log(res);
+    })
+};
+let addDepartment = () => {
+    inquirer.prompt([
+        {
+            message: "Enter new department name:",
+            type: "input",
+            name: "name"
+        }
+    ]).then((res) => {
+        console.log(res);
+    })
+};
 
 //ASYNC FUNCTIONS
 let getEmployees = async () => {
-    let employees = await CRUD.getEmployees();
+    employees = await CRUD.getEmployees();
     console.log(employees);
 }
-main();
+let getRoles = async () =>{
+    roles = await CRUD.getRoles();
+    console.log(roles);
+}
+let getDepartments = async ()=>{
+    departments = await CRUD.getDepartments();
+    console.log(departments);
+}
+// main();
+
+getDepartments();
+getRoles();
+getEmployees();
