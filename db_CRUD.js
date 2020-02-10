@@ -24,21 +24,31 @@ let endConnection = () => {
 //Views
 let view = (table) => {
     //Format input to match table names
-    table = table.toLowerCase(); 
+    table = table.toLowerCase();
     table = table.substring(0, table.length - 1);
-    
+
     let query = connection.query(
-        "SELECT * FROM ?", [table],
-        (err, res)=>{
-            switch(table){
+        "SELECT * FROM "+table,
+        (err, res) => {
+            if(err) throw err;
+            switch (table) {
                 case table = "department":
-                    console.log("Depart data");
+                    console.log("----- Departments -----")
+                    for (let i = 0; i < res.length; i++) {
+                        console.log(`Department ID: ${res[i].dep_id} || Department Name: ${res[i].name}`);
+                    }
                     break;
                 case table = "role":
-                    console.log("role data");
+                    console.log("----- Roles -----")
+                    for (let i = 0; i < res.length; i++) {
+                        console.log(`Role ID: ${res[i].role_id} || Role Title: ${res[i].title} || Salary: ${res[i].salary} || Department: ${res[i].dep_id}`);
+                    }
                     break;
                 case table = "employee":
-                    console.log("employee data")
+                    console.log("----- Employees -----")
+                    for (let i = 0; i < res.length; i++) {
+                        console.log(`Employee ID: ${res[i].employee_id} || Employee Name: ${res[i].first_name} ${res[i].last_name} || Role ID: ${res[i].role_id}`);
+                    }
                     break;
                 default:
                     console.log("An Error occurred, hit ctrl^C to escape");
@@ -47,6 +57,7 @@ let view = (table) => {
 
     );
 }
+
 
 
 

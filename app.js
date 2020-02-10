@@ -85,24 +85,8 @@ let VIEW = () => {
         }else{
             //NEEDS TO BE ASYNC AWAIT BEFORE RETURNING TO INITIAL OPTION LIST
             CRUD.view(resp.choice);
-            start();
+            // start();
         }
-        // switch (resp.choice) {
-        //     case resp.choice = "Departments":
-        //         console.log("1")
-        //         break;
-        //     case resp.choice = "Roles":
-        //         console.log("2")
-        //         break;
-        //     case resp.choice = "Employees":
-        //         console.log("3")
-        //         break;
-        //     case resp.choice = "Return":
-        //         start();
-        //         break;
-        //     default:
-        //         console.log("Error occurred, please try again or enter: ctrl^c to exit.");
-        // }
     });
 };
 let EXIT = () => {
