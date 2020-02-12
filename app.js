@@ -1,9 +1,25 @@
 let inquirer = require("inquirer");
-let CRUD = require("./db_CRUD");
+let sql = require("mysql");
+//Database connection
+let connection = sql.createConnection({
+    host: "localhost",
+    port: 3306,
+    // Your username
+    user: "root",
+    // Your password
+    password: "Blizzard_12",
+    database: "company_db"
+});
+//Establish/Withdrawal connection
+connection.connect(function (err) {
+    if (err) throw err;
+    main();
+    // console.log("connected as id " + connection.threadId);
+});
+let endConnection = () => {
+    connection.end();
+}
 
-let employees = [];
-let roles = [];
-let departments = [];
 
 let main = () => {
     console.log("--------- Content Management System----------\n          ----- Version 1.0.0 -----     ")
@@ -66,14 +82,38 @@ let ADD = () => {
     });
 };
 let MODIFY = () => {
-    // let _employees = getEmployees().then((res)=>{console.log(res)}).catch((err)=>{console.log(err)});
-    getEmployees();
-    CRUD.endConnection();
-
-    // .catch((err)=>{console.log(err)})
-    // prompt which employee you want to update
-    //CRUD update call
-
+    console.log("Feature coming soon =) 2/11/20")
+    start();
+    // inquirer.prompt([
+    //     {
+    //         message: "Which Employee would you like to update?",
+    //         type:list,
+    //         choices: ["Dan","Erik" ,"Gary", "Brendan", "Michael", "May", "Jon"], //Temporary hard coding until I workout ASYNC/AWAIT to have this dat updated at all times
+    //         name: "employee" 
+    //     },
+    //     {
+    //         message:"Provide Employee's new role",
+    //         type:"list",
+    //         choices: [],//Again ASYNC/AWAIT role table data
+    //         name: "newRole"
+    //     },
+    //     {
+    //         message:"OPTIONAL: Indicate Employee's new manager's ID",
+    //         type: list,
+    //         choices: [], // ASYNC AWAIT select name from employees where manager_id = 0;
+    //         name: "newManagerID"
+    //     }
+    // ]).then((res)=>{
+    //     connection.query("UPDATE employee SET ? ? WHERE ?",[
+    //         {role_id : res.newRole[0]},
+    //         {manager_id : res.newManagerID[0]},
+    //         {employee_id: res.employee[0]}
+    //     ], (err)=>{
+    //         if(err)throw err;
+    //         console.log("Database Update successful!");
+    //         start();
+    //     })
+    // })
 };
 let VIEW = () => {
     inquirer.prompt([
@@ -87,19 +127,16 @@ let VIEW = () => {
         if (resp.choice === "Return") {
             start();
         } else {
-            //NEEDS TO BE ASYNC AWAIT BEFORE RETURNING TO INITIAL OPTION LIST
-            CRUD.view(resp.choice);
-            // start();
+            view(resp.choice);
         }
     });
 };
 let EXIT = () => {
-    CRUD.endConnection();
+    endConnection();
     console.log(" ------------- Exiting CMS ------------- ")
 };
 
 // CRUD INQUIRIES
-
 let addEmployee = () => {
     inquirer.prompt([
         {
@@ -110,20 +147,21 @@ let addEmployee = () => {
         {
             message: "Provide Employee's Last Name",
             type: "input",
-            name: "Last_name"
+            name: "last_name"
         },
         {
             message: "Select Employee's Role",
             type: "list",
-            choices: ["DUMMY LIST"],//GET LIST
+            choices: ["Sales Manager", "Sales Rep", "Full Stack Dev", "Front End Dev", "Back End Dev", "Legal Manager", "Legal Rep"],
             name: "role"
-        }, {
-            message: "OPTIONAL: Provide Employee's Manager id",
-            type: "input",
-            name: "managerID"
-        },
+        },//{
+        //     message: "OPTIONAL: Provide Employee's Manager id",
+        //     type: "input",
+        //     name: "managerID"
+        // }
     ]).then((res) => {
-        console.log(res);
+        newEmployee(res);
+        start();
     })
 };
 let addRole = () => {
@@ -141,11 +179,12 @@ let addRole = () => {
         {
             message: "Which department does this position belong to?:",
             type: "list",
-            choices: ["DUMMY LIST"], //GET CHOICES
+            choices: ["Sales", "Engineering", "Legal"], //GET CHOICES
             name: "department_id"
         },
     ]).then((res) => {
-        console.log(res);
+        newRole(res);
+        start();
     })
 };
 let addDepartment = () => {
@@ -156,25 +195,71 @@ let addDepartment = () => {
             name: "name"
         }
     ]).then((res) => {
-        console.log(res);
+        newDepartment(res);
+        console.log("\n")
+        start();
     })
 };
 
-//ASYNC FUNCTIONS
-let getEmployees = async () => {
-    employees = await CRUD.getEmployees();
-    console.log(employees);
-}
-let getRoles = async () =>{
-    roles = await CRUD.getRoles();
-    console.log(roles);
-}
-let getDepartments = async ()=>{
-    departments = await CRUD.getDepartments();
-    console.log(departments);
-}
-// main();
 
-getDepartments();
-getRoles();
-getEmployees();
+//CRUD FUNCTIONS
+let view = (table) => {
+    //Format input to match table names
+    table = table.toLowerCase();
+    table = table.substring(0, table.length - 1);
+
+    let query = connection.query(
+        "SELECT * FROM " + table,
+        (err, res) => {
+            if (err) throw err;
+            switch (table) {
+                case table = "department":
+                    console.log("----- Departments -----\n");
+                    for (let i = 0; i < res.length; i++) {
+                        console.log(`Department ID: ${res[i].dep_id} || Department Name: ${res[i].name}`);
+                    }
+                    start();
+                    break;
+                case table = "role":
+                    console.log("----- Roles ----- \n");
+                    for (let i = 0; i < res.length; i++) {
+                        console.log(`Role ID: ${res[i].role_id} || Role Title: ${res[i].title} || Salary: ${res[i].salary} || Department: ${res[i].dep_id}`);
+                    }
+                    start();
+                    break;
+                case table = "employee":
+                    console.log("----- Employees -----");
+                    for (let i = 0; i < res.length; i++) {
+                        console.log(`Employee ID: ${res[i].employee_id} || Employee Name: ${res[i].first_name} ${res[i].last_name} || Role ID: ${res[i].role_id}`);
+                    }
+                    start();
+                    break;
+                default:
+                    console.log("An Error occurred, please contact your DBA");
+                    start();
+            }
+        }
+
+    );
+}
+let newEmployee = (input) => {
+    let query = connection.query("INSERT INTO employee SET ?", {
+        first_name: input.firstName,
+        last_name: input.lastName,
+        role_id: input.role[0]
+    });
+    console.log("Employee Added!")
+}
+let newRole = (input) => {
+    let query = connection.query("INSERT INTO role SET ?", {
+        tile: input.title,
+        salary: input.salary
+    });
+    console.log("Role Added!")
+}
+let newDepartment = (input) => {
+    let query = connection.query("INSERT INTO department SET ?", {
+        name: input.name,
+    });
+    console.log("Department Added!");
+}
